@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:polmitra_admin/models/indian_state.dart';
 
@@ -19,17 +20,15 @@ class CityStateProvider {
 
     final List<dynamic> jsonList = json.decode(jsonString);
 
-    _states = jsonList.map<IndianState>((json) => IndianState.fromJson(json)).toList();
+    _states = jsonList
+        .map<IndianState>((json) => IndianState.fromJson(json))
+        .toList();
   }
 
   List<IndianState> get states {
-    if(_instance._states.isEmpty) {
+    if (_instance._states.isEmpty) {
       throw Exception('States not loaded');
     }
     return _instance._states;
   }
 }
-
-
-
-

@@ -19,8 +19,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final double _formLabelFontSize = 16.0;
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(text: "admin@gmail.com");
+  final _passwordController = TextEditingController(text: "admin@123");
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
           await PrefsService.saveUser(state.user);
           _navigateToHomeScreen();
         } else if (state is AuthFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.error)));
         }
       },
       child: Scaffold(
@@ -45,30 +46,36 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ClipRRect(borderRadius: BorderRadius.circular(20), child: Image.asset('assets/polmitra.jpg')),
+                  ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset('assets/polmitra.jpg')),
                   const SizedBox(height: 40),
                   TextFormField(
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      labelStyle: TextBuilder.getTextStyle(fontSize: _formLabelFontSize),
+                      labelStyle: TextBuilder.getTextStyle(
+                          fontSize: _formLabelFontSize),
                       border: BorderProvider.createBorder(),
                       enabledBorder: BorderProvider.createBorder(),
                       focusedBorder: BorderProvider.createBorder(),
                     ),
-                    validator: (value) => value!.isEmpty ? 'Please enter your email' : null,
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please enter your email' : null,
                     controller: _emailController,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      labelStyle: TextBuilder.getTextStyle(fontSize: _formLabelFontSize),
+                      labelStyle: TextBuilder.getTextStyle(
+                          fontSize: _formLabelFontSize),
                       border: BorderProvider.createBorder(),
                       enabledBorder: BorderProvider.createBorder(),
                       focusedBorder: BorderProvider.createBorder(),
                     ),
                     obscureText: true,
-                    validator: (value) => value!.isEmpty ? 'Please enter your password' : null,
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please enter your password' : null,
                     controller: _passwordController,
                   ),
                   const SizedBox(height: 40),
@@ -76,11 +83,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(10),
                       fixedSize: const Size(150, 45),
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12))),
                       backgroundColor: ColorProvider.vibrantSaffron,
                     ),
                     child: TextBuilder.getText(
-                        text: "Login", color: ColorProvider.normalWhite, fontSize: 18, fontWeight: FontWeight.bold),
+                        text: "Login",
+                        color: ColorProvider.normalWhite,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
                     onPressed: () async {
                       // if (_formKey.currentState!.validate()) {
                       //   _formKey.currentState!.save();
@@ -89,7 +100,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       // }
                       final bloc = context.read<AuthBloc>();
                       await PrefsService.clear();
-                      bloc.add(LoginRequested(email: _emailController.text, password: _passwordController.text));
+                      bloc.add(LoginRequested(
+                          email: _emailController.text,
+                          password: _passwordController.text));
                       // _navigateToHomeScreen();
                     },
                   ),
@@ -103,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _navigateToHomeScreen() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const HomeScreen()));
   }
 }
