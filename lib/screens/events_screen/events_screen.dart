@@ -19,7 +19,7 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  PersistentBottomSheetController? _eventBottomSheetController;
+  // PersistentBottomSheetController? _eventBottomSheetController;
 
   String _searchQuery = '';
   String _selectedCity = 'All';
@@ -266,21 +266,26 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
 
         /// On tap
-        onTap: () => _showEventBottomSheet(event));
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EventDetailsScreen(event: event),
+              fullscreenDialog: true,
+            )));
   }
 
-  void _showEventBottomSheet(Event event) {
-    _eventBottomSheetController = showBottomSheet(
-      context: context,
-      builder: (context) {
-        return EventDetailsScreen(event: event);
-      },
-    );
-  }
+  // void _showEventBottomSheet(Event event) {
+  //   _eventBottomSheetController = showBottomSheet(
+  //     context: context,
+  //     builder: (context) {
+  //       return EventDetailsScreen(event: event);
+  //     },
+  //   );
+  // }
 
   @override
   void dispose() {
     super.dispose();
-    _eventBottomSheetController?.close();
+    // _eventBottomSheetController?.close();
   }
 }

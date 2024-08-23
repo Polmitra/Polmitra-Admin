@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firebase Firestore
 import 'package:flutter/material.dart';
+import 'package:polmitra_admin/utils/color_provider.dart';
 import 'package:polmitra_admin/utils/text_builder.dart';
 
 import '../../models/event.dart';
@@ -27,10 +28,33 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     _checkIfRatingSubmitted();
   }
 
-  // Convert milliseconds to a readable time format
-  String formatTime(int milliseconds) {
+  // Convert milliseconds to a readable date and time format with AM/PM
+  String formatDateTime(int milliseconds) {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(milliseconds);
-    return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    final formattedDate =
+        '${dateTime.day.toString().padLeft(2, '0')} ${_monthName(dateTime.month)} ${dateTime.year}';
+    final formattedTime =
+        '${dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} ${dateTime.hour >= 12 ? 'PM' : 'AM'}';
+    return '$formattedDate at $formattedTime';
+  }
+
+  // Helper function to get month name from month number
+  String _monthName(int month) {
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    return monthNames[month - 1];
   }
 
   // Check if the rating has already been submitted
@@ -42,7 +66,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       final data = doc.data();
       if (data != null) {
         setState(() {
-          _rating = data['rating']?.toInt();
+          _rating = data['points']?.toInt();
           _ratingSubmitted = _rating != null;
         });
       }
@@ -58,7 +82,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
     final eventRef =
         FirebaseFirestore.instance.collection('events').doc(_event.id);
-    await eventRef.update({'rating': rating});
+    await eventRef.update({'points': rating});
   }
 
   @override
@@ -71,12 +95,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       appBar: AppBar(
         title: Text(
           'Event Details',
-          style: Theme.of(context)
-              .textTheme
-              .headlineLarge
-              ?.copyWith(color: Colors.white),
+          style: Theme.of(context).textTheme.headlineLarge?.copyWith(),
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: ColorProvider.lemonYellow,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(15.0),
@@ -156,62 +177,57 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            // Starting and Ending Time in Simple Cards
+            // Starting and Ending Time as ListTiles
             if (_event.createdAt != null && _event.endingTime != null)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Card(
-                    color: Colors.green.shade50,
-                    elevation: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(15),
-                      leading: Icon(
-                        Icons.access_time,
-                        color: Colors.green.shade800,
-                      ),
-                      title: Text(
-                        'Start Time',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green.shade800,
-                                ),
-                      ),
-                      subtitle: Text(
-                        formatTime(
-                            _event.createdAt!.toDate().millisecondsSinceEpoch),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.green.shade800,
-                            ),
-                      ),
+                  ListTile(
+                    tileColor: Colors.blue.shade50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Icon(
+                      Icons.schedule,
+                      color: Colors.blue.shade800,
+                    ),
+                    title: Text(
+                      'Start Time',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade800,
+                          ),
+                    ),
+                    subtitle: Text(
+                      formatDateTime(
+                          _event.createdAt!.toDate().millisecondsSinceEpoch),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.blue.shade800,
+                          ),
                     ),
                   ),
-                  Card(
-                    color: Colors.red.shade50,
-                    elevation: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(15),
-                      leading: Icon(
-                        Icons.access_time,
-                        color: Colors.red.shade800,
-                      ),
-                      title: Text(
-                        'End Time',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red.shade800,
-                                ),
-                      ),
-                      subtitle: Text(
-                        formatTime(_event.endingTime!),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.red.shade800,
-                            ),
-                      ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    tileColor: Colors.orange.shade50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Icon(
+                      Icons.schedule,
+                      color: Colors.orange.shade800,
+                    ),
+                    title: Text(
+                      'End Time',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange.shade800,
+                          ),
+                    ),
+                    subtitle: Text(
+                      formatDateTime(_event.endingTime!),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.orange.shade800,
+                          ),
                     ),
                   ),
                 ],
@@ -290,7 +306,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     'Event Ending Image',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal,
+                          // color: Colors.teal,
                         ),
                   ),
                   const SizedBox(height: 10),
