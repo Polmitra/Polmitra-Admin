@@ -24,44 +24,49 @@ class _EventsScreenState extends State<EventsScreen> {
   String _searchQuery = '';
   String _selectedCity = 'All';
   String _selectedState = 'All';
-  List<String> _cities = ['All']; // This will be populated based on the selected state
+  List<String> _cities = [
+    'All'
+  ]; // This will be populated based on the selected state
   List<String> _states = ['All']; // Populate this with the list of states
+
+  Future<void> _fetchStatesAndCities() async {
+    try {
+      var states = await CityStateProvider().states;
+      setState(() {
+        _states = ['All'] + states.map((state) => state.statename).toList();
+        _cities = ['All']; // Default cities list
+      });
+    } catch (e) {
+      // Handle errors if necessary
+      print('Error fetching states and cities: $e');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _loadEvents();
-
-    CityStateProvider(); // triggers fetching of states and cities
     _fetchStatesAndCities();
   }
 
   Future<void> _loadEvents() async {
     final bloc = context.read<EventBloc>();
-
     bloc.add(LoadEvents());
-  }
-
-  void _fetchStatesAndCities() async {
-    var states = CityStateProvider().states;
-    // Assuming 'states' is now a list of IndianState objects
-    setState(() {
-      _states = ['All'] + states.map((state) => state.statename).toList();
-      _cities = ['All']; // Default cities list
-    });
   }
 
   List<Event> _filterEvents(List<Event> eventsEntry) {
     return eventsEntry.where((event) {
       // Check if the event matches the search query, if any
-      bool matchesSearchQuery = _searchQuery.isEmpty || event.eventName.toLowerCase().contains(_searchQuery);
-
+      bool matchesSearchQuery = _searchQuery.isEmpty ||
+          event.eventName.toLowerCase().contains(_searchQuery.toLowerCase());
 
       // Check if the event matches the selected state, if any
-      bool matchesState = _selectedState == 'All' || event.state.statename == _selectedState;
+      bool matchesState =
+          _selectedState == 'All' || event.state.statename == _selectedState;
 
       // Check if the event matches the selected city, if any
-      bool matchesCity = _selectedCity == 'All' || event.city.cityname == _selectedCity;
+      bool matchesCity =
+          _selectedCity == 'All' || event.city.cityname == _selectedCity;
 
       return matchesSearchQuery && matchesState && matchesCity;
     }).toList();
@@ -72,14 +77,14 @@ class _EventsScreenState extends State<EventsScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          /// name search field
+          /// Name search field
           Container(
             width: 200,
             padding: const EdgeInsets.all(8),
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  _searchQuery = value.toLowerCase();
+                  _searchQuery = value;
                 });
               },
               decoration: const InputDecoration(
@@ -98,22 +103,32 @@ class _EventsScreenState extends State<EventsScreen> {
                   items: _states.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: SizedBox(width: 150, child: TextBuilder.getText(text: value, fontSize: 14)),
+                      child: SizedBox(
+                          width: 150,
+                          child:
+                              TextBuilder.getText(text: value, fontSize: 14)),
                     );
                   }).toList(),
-                  onChanged: (String? newValue) {
+                  onChanged: (String? newValue) async {
+                    final statesData = await CityStateProvider().states;
                     setState(() {
                       _selectedState = newValue!;
+
                       if (newValue != 'All') {
-                        var selectedStateObj = CityStateProvider().states.firstWhere(
-                              (state) => state.statename == newValue,
-                              orElse: () => IndianState(stateid: 0, statename: '', cities: []),
-                            );
-                        _cities = ['All'] + selectedStateObj.cities.map((city) => city.cityname).toList();
+                        var selectedStateObj = statesData.firstWhere(
+                          (state) => state.statename == newValue,
+                          orElse: () => IndianState(
+                              stateid: 0, statename: '', cities: []),
+                        );
+                        _cities = ['All'] +
+                            selectedStateObj.cities
+                                .map((city) => city.cityname)
+                                .toList();
                       } else {
                         _cities = ['All'];
                       }
-                      _selectedCity = 'All'; // Reset city selection when state changes
+                      _selectedCity =
+                          'All'; // Reset city selection when state changes
                     });
                   },
                 ),
@@ -126,7 +141,10 @@ class _EventsScreenState extends State<EventsScreen> {
                   items: _cities.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: SizedBox(width: 150, child: TextBuilder.getText(text: value, fontSize: 14)),
+                      child: SizedBox(
+                          width: 150,
+                          child:
+                              TextBuilder.getText(text: value, fontSize: 14)),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
@@ -204,10 +222,16 @@ class _EventsScreenState extends State<EventsScreen> {
   Widget _buildEventCard(Event event) {
     return ListTile(
         title: TextBuilder.getText(
-            text: event.eventName, fontWeight: FontWeight.bold, fontSize: 14, overflow: TextOverflow.ellipsis),
-        subtitle: TextBuilder.getText(text: event.description, overflow: TextOverflow.ellipsis, fontSize: 12),
+            text: event.eventName,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            overflow: TextOverflow.ellipsis),
+        subtitle: TextBuilder.getText(
+            text: event.description,
+            overflow: TextOverflow.ellipsis,
+            fontSize: 12),
 
-        /// leading image
+        /// Leading image
         leading: SizedBox(
           width: 80,
           child: CachedNetworkImage(
@@ -220,25 +244,28 @@ class _EventsScreenState extends State<EventsScreen> {
                 ),
               ),
             ),
-            imageUrl: event.images.isNotEmpty ? event.images.first : 'https://via.placeholder.com/150',
+            imageUrl: event.images.isNotEmpty
+                ? event.images.first
+                : 'https://via.placeholder.com/150',
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
 
-        /// isActive switch
+        /// IsActive switch
         trailing: Transform.scale(
           scale: 0.8,
           child: Switch(
             activeColor: Colors.blue,
-            trackColor: MaterialStateColor.resolveWith((states) => Colors.grey),
+            trackColor: WidgetStateColor.resolveWith((states) => Colors.grey),
             value: event.isActive,
             onChanged: (bool eventActiveStatus) {
-              BlocProvider.of<EventBloc>(context).add(UpdateEventActiveStatus(event.id, eventActiveStatus));
+              BlocProvider.of<EventBloc>(context)
+                  .add(UpdateEventActiveStatus(event.id, eventActiveStatus));
             },
           ),
         ),
 
-        /// on tap
+        /// On tap
         onTap: () => _showEventBottomSheet(event));
   }
 
