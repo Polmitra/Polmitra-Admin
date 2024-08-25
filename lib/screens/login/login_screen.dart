@@ -7,7 +7,7 @@ import 'package:polmitra_admin/bloc/auth/auth_state.dart';
 import 'package:polmitra_admin/screens/home_screen/home_screen.dart';
 import 'package:polmitra_admin/services/prefs_services.dart';
 import 'package:polmitra_admin/utils/border_provider.dart';
-import 'package:polmitra_admin/utils/color_provider.dart';
+import 'package:polmitra_admin/utils/app_colors.dart';
 import 'package:polmitra_admin/utils/text_builder.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -95,11 +95,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       fixedSize: const Size(150, 45),
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12))),
-                      backgroundColor: ColorProvider.vibrantSaffron,
+                      backgroundColor: AppColors.vibrantSaffron,
                     ),
                     child: TextBuilder.getText(
                         text: "Login",
-                        color: ColorProvider.normalWhite,
+                        color: AppColors.normalWhite,
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
                     onPressed: () async {

@@ -1,13 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:polmitra_admin/bloc/polls/polls_bloc.dart';
 import 'package:polmitra_admin/bloc/polls/polls_event.dart';
 import 'package:polmitra_admin/bloc/polls/polls_state.dart';
 import 'package:polmitra_admin/models/poll.dart';
 import 'package:polmitra_admin/screens/polls_screen/poll_details_screen.dart';
-import 'package:polmitra_admin/utils/color_provider.dart';
+import 'package:polmitra_admin/utils/app_colors.dart';
 import 'package:polmitra_admin/utils/text_builder.dart';
 
 class PollsScreen extends StatefulWidget {
@@ -67,7 +65,8 @@ class _PollsScreenState extends State<PollsScreen> {
   List<Poll> _filterPolls(List<Poll> pollsEntry) {
     return pollsEntry.where((poll) {
       print(poll.toMap());
-      bool matchesSearchQuery = poll.question.toLowerCase().contains(_searchQuery);
+      bool matchesSearchQuery =
+          poll.question.toLowerCase().contains(_searchQuery);
       return matchesSearchQuery;
     }).toList();
   }
@@ -81,11 +80,11 @@ class _PollsScreenState extends State<PollsScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
           child: Container(
               decoration: BoxDecoration(
-                color: ColorProvider.normalWhite,
+                color: AppColors.normalWhite,
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: ColorProvider.darkGreyColor,
+                    color: AppColors.darkGreyColor,
                     offset: const Offset(0.0, 1.5), //(x,y)
                     blurRadius: 8.0,
                   ),
@@ -126,15 +125,19 @@ class _PollsScreenState extends State<PollsScreen> {
     final uploadedBy = poll.neta?.email ?? poll.netaId;
 
     return ListTile(
-      title: TextBuilder.getText(text: poll.question, fontWeight: FontWeight.bold, fontSize: 16),
-      subtitle: TextBuilder.getText(text: uploadedBy, fontWeight: FontWeight.normal, fontSize: 12),
-      leading: TextBuilder.getText(text: "${index + 1}", fontWeight: FontWeight.bold, fontSize: 16),
+      title: TextBuilder.getText(
+          text: poll.question, fontWeight: FontWeight.bold, fontSize: 16),
+      subtitle: TextBuilder.getText(
+          text: uploadedBy, fontWeight: FontWeight.normal, fontSize: 12),
+      leading: TextBuilder.getText(
+          text: "${index + 1}", fontWeight: FontWeight.bold, fontSize: 16),
       trailing: Switch(
         activeColor: Colors.blue,
         trackColor: MaterialStateColor.resolveWith((states) => Colors.grey),
         value: poll.isActive,
         onChanged: (value) {
-          BlocProvider.of<PollBloc>(context).add(UpdatePollActiveStatus(poll.id, value));
+          BlocProvider.of<PollBloc>(context)
+              .add(UpdatePollActiveStatus(poll.id, value));
         },
       ),
       onTap: () => _showPollDetailsBottomSheet(poll, uploadedBy),

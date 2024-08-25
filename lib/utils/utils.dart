@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:polmitra_admin/utils/text_builder.dart';
+
+import 'app_colors.dart';
 import 'text_utility.dart';
-import 'color_provider.dart';
 
 showToast({String msg = ""}) {
-  Fluttertoast.showToast(msg: msg, toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, fontSize: 16.0);
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      fontSize: 16.0);
 }
 
 getBorder() {
@@ -14,12 +19,17 @@ getBorder() {
 
 getOutLineBorder() {
   return OutlineInputBorder(
-    borderSide: BorderSide(color: ColorProvider.greyColor, width: 0.2),
+    borderSide: BorderSide(color: AppColors.greyColor, width: 0.2),
   );
 }
 
-commonBtn({String text = "Next", Color? bgColor, bool isEnable = false, required Function calll, double width = 140}) {
-  bgColor = bgColor ?? ColorProvider.blueDarkShade;
+commonBtn(
+    {String text = "Next",
+    Color? bgColor,
+    bool isEnable = false,
+    required Function calll,
+    double width = 140}) {
+  bgColor = bgColor ?? AppColors.blueDarkShade;
   return GestureDetector(
     onTap: isEnable
         ? () {
@@ -32,13 +42,14 @@ commonBtn({String text = "Next", Color? bgColor, bool isEnable = false, required
           height: 40,
           width: width,
           decoration: BoxDecoration(
-              border: Border.all(color: ColorProvider.blueDarkShade, width: 2),
+              border: Border.all(color: AppColors.blueDarkShade, width: 2),
               color: isEnable ? bgColor : Colors.white,
               borderRadius: const BorderRadius.all(Radius.circular(5))),
           child: Center(
               child: Text(
             text,
-            style: TextUtility.getStyle(14, color: isEnable ? Colors.white : Colors.black),
+            style: TextUtility.getStyle(14,
+                color: isEnable ? Colors.white : Colors.black),
           ))),
     ),
   );
@@ -51,7 +62,7 @@ commonIconBtn(
     bool isEnable = false,
     required Function calll,
     double width = 140}) {
-  bgColor = bgColor ?? ColorProvider.blueDarkShade;
+  bgColor = bgColor ?? AppColors.blueDarkShade;
   return GestureDetector(
     onTap: () {
       calll.call();
@@ -61,16 +72,18 @@ commonIconBtn(
         // width: width,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-            border: Border.all(color: ColorProvider.blueDarkShade, width: 2),
+            border: Border.all(color: AppColors.blueDarkShade, width: 2),
             color: isEnable ? bgColor : Colors.white,
             borderRadius: const BorderRadius.all(Radius.circular(5))),
         child: Center(
             child: Row(
           children: [
-            if (icon != null) Container(padding: const EdgeInsets.only(right: 8), child: icon),
+            if (icon != null)
+              Container(padding: const EdgeInsets.only(right: 8), child: icon),
             Text(
               text,
-              style: TextUtility.getStyle(16, color: isEnable ? Colors.white : Colors.black),
+              style: TextUtility.getStyle(16,
+                  color: isEnable ? Colors.white : Colors.black),
             ),
           ],
         ))),
@@ -130,7 +143,9 @@ commonSearchArea(
 
 /// date picker
 Widget datePicker(
-    {required Function onClick, String title = "From Date", required TextEditingController datePickerTextController}) {
+    {required Function onClick,
+    String title = "From Date",
+    required TextEditingController datePickerTextController}) {
   String dateText = datePickerTextController.text;
 
   return Column(
@@ -143,7 +158,8 @@ Widget datePicker(
       TextFormField(
         controller: datePickerTextController,
         decoration: InputDecoration(
-            constraints: const BoxConstraints(maxWidth: 200, minWidth: 150, minHeight: 40, maxHeight: 45),
+            constraints: const BoxConstraints(
+                maxWidth: 200, minWidth: 150, minHeight: 40, maxHeight: 45),
             border: const OutlineInputBorder(),
             suffixIcon: const Icon(Icons.calendar_today),
             hintText: dateText.isNotEmpty ? dateText : "Select Date"),

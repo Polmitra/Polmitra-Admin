@@ -13,9 +13,11 @@ import 'package:polmitra_admin/firebase_options.dart';
 import 'package:polmitra_admin/screens/login/login_screen.dart';
 import 'package:polmitra_admin/services/prefs_services.dart';
 import 'package:polmitra_admin/services/user_service.dart';
-import 'package:polmitra_admin/utils/color_provider.dart';
+import 'package:polmitra_admin/utils/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
+final shorebirdCodePush = ShorebirdCodePush();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -71,8 +73,8 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Polmitra App',
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSwatch(
-                backgroundColor: ColorProvider.normalWhite),
+            colorScheme:
+                ColorScheme.fromSwatch(backgroundColor: AppColors.normalWhite),
             textTheme: GoogleFonts.poppinsTextTheme(),
           ),
           home: const LoginScreen(),

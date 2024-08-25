@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:polmitra_admin/utils/color_provider.dart';
+import 'package:polmitra_admin/utils/app_colors.dart';
 
 class IconBuilder {
   static IconButton buildButton({
     required IconData icon,
-    Color color = ColorProvider.normalBlack,
+    Color color = AppColors.normalBlack,
     void Function()? onPressed,
     double size = 15,
     ButtonStyle? buttonStyle,

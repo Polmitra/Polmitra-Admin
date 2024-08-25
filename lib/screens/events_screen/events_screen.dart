@@ -8,7 +8,7 @@ import 'package:polmitra_admin/models/event.dart';
 import 'package:polmitra_admin/models/indian_state.dart';
 import 'package:polmitra_admin/screens/events_screen/event_details_screen.dart';
 import 'package:polmitra_admin/utils/city_state_provider.dart';
-import 'package:polmitra_admin/utils/color_provider.dart';
+import 'package:polmitra_admin/utils/app_colors.dart';
 import 'package:polmitra_admin/utils/text_builder.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -201,11 +201,11 @@ class _EventsScreenState extends State<EventsScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
           child: Container(
             decoration: BoxDecoration(
-              color: ColorProvider.normalWhite,
+              color: AppColors.normalWhite,
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: ColorProvider.darkGreyColor,
+                  color: AppColors.darkGreyColor,
                   offset: const Offset(0.0, 1.5), //(x,y)
                   blurRadius: 8.0,
                 ),

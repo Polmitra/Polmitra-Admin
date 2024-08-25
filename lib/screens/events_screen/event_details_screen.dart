@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:polmitra_admin/utils/color_provider.dart';
+import 'package:polmitra_admin/utils/app_colors.dart';
 import 'package:polmitra_admin/utils/text_builder.dart';
 
 import '../../models/event.dart';
@@ -159,7 +159,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           'Event Details',
           style: Theme.of(context).textTheme.headlineLarge?.copyWith(),
         ),
-        backgroundColor: ColorProvider.lemonYellow,
+        backgroundColor: AppColors.lemonYellow,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(15.0),
