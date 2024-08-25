@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:polmitra_admin/bloc/auth/auth_bloc.dart';
@@ -21,6 +22,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final double _formLabelFontSize = 16.0;
   final _emailController = TextEditingController(text: "admin@gmail.com");
   final _passwordController = TextEditingController(text: "admin@123");
+  @override
+  void initState() {
+    super.initState();
+    if (FirebaseAuth.instance.currentUser != null && mounted) {
+      Future.delayed(Durations.medium1).then(
+        (value) => _navigateToHomeScreen(),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

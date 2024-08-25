@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firebase Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:polmitra_admin/utils/color_provider.dart';
 import 'package:polmitra_admin/utils/text_builder.dart';
@@ -73,16 +73,52 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     }
   }
 
-  // Handle rating selection
-  Future<void> _selectRating(int rating) async {
-    setState(() {
-      _rating = rating;
-      _ratingSubmitted = true;
-    });
+  // Show a confirmation dialog
+  Future<bool> _showConfirmationDialog(int rating) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Submit Rating'),
+              content: Text('Are you sure you want to give $rating points?'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+                TextButton(
+                  child: const Text('Submit'),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Default to false if dialog is dismissed
+  }
 
-    final eventRef =
-        FirebaseFirestore.instance.collection('events').doc(_event.id);
-    await eventRef.update({'points': rating});
+  // Handle rating selection with confirmation
+  Future<void> _selectRating(int rating) async {
+    final shouldSubmit = await _showConfirmationDialog(rating);
+    if (shouldSubmit) {
+      setState(() {
+        _rating = rating;
+        _ratingSubmitted = true;
+      });
+
+      final eventRef =
+          FirebaseFirestore.instance.collection('events').doc(_event.id);
+      await eventRef.update({'points': rating});
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Rating submitted successfully!')),
+      );
+    }
   }
 
   @override
@@ -267,77 +303,32 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withOpacity(0.2),
                               offset: const Offset(0, 4),
-                              blurRadius: 8,
+                              blurRadius: 6,
                             ),
                           ],
                         ),
                       );
                     },
                     placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
+                        const CircularProgressIndicator(),
                     errorWidget: (context, url, error) =>
-                        const Center(child: Icon(Icons.error)),
+                        const Icon(Icons.error),
                   );
                 },
                 options: CarouselOptions(
-                  height: 180,
                   aspectRatio: 16 / 9,
                   viewportFraction: 0.8,
                   initialPage: 0,
                   enableInfiniteScroll: true,
                   autoPlay: true,
-                  autoPlayInterval: const Duration(seconds: 5),
+                  autoPlayInterval: const Duration(seconds: 3),
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  autoPlayCurve: Curves.easeInOut,
+                  autoPlayCurve: Curves.fastOutSlowIn,
                   enlargeCenterPage: true,
                   scrollDirection: Axis.horizontal,
                 ),
-              ),
-            const SizedBox(height: 20),
-            // Event Ending Image with Title
-            if (_event.endingImageUrl != null &&
-                _event.endingImageUrl!.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Event Ending Image',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          // color: Colors.teal,
-                        ),
-                  ),
-                  const SizedBox(height: 10),
-                  CachedNetworkImage(
-                    imageUrl: _event.endingImageUrl!,
-                    imageBuilder: (context, imageProvider) {
-                      return Container(
-                        width: double.infinity,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Center(child: Icon(Icons.error)),
-                  ),
-                ],
               ),
             const SizedBox(height: 20),
             // Rating Section
@@ -346,7 +337,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Rate the Event',
+                    'Point the Event',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.teal,
@@ -355,12 +346,26 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   const SizedBox(height: 10),
                   _ratingSubmitted
                       ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Rating: $_rating'),
-                            const SizedBox(width: 10),
-                            const Icon(
-                              Icons.star,
-                              color: Colors.teal,
+                            Row(
+                              children: [
+                                Text('Points: $_rating'),
+                                const SizedBox(width: 10),
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.teal,
+                                ),
+                              ],
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _ratingSubmitted =
+                                      false; // Allow rating to be edited
+                                });
+                              },
+                              child: const Text('Edit Rating'),
                             ),
                           ],
                         )
@@ -387,6 +392,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                             );
                           }),
                         ),
+                  const SizedBox(height: 20),
                 ],
               ),
           ],
