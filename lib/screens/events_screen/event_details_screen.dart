@@ -112,7 +112,33 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
       final eventRef =
           FirebaseFirestore.instance.collection('events').doc(_event.id);
+
+      // Fetch the current event data
+      final eventDoc = await eventRef.get();
+      final eventData = eventDoc.data();
+      final oldRating = eventData?['points']?.toInt() ?? 0;
+
+      // Update event points
       await eventRef.update({'points': rating});
+
+      // Update user points
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(_event.karyakartaId);
+
+      // Fetch the current user data
+      final userDoc = await userRef.get();
+      final userData = userDoc.data();
+      final currentPoints = userData?['points']?.toInt() ?? 0;
+
+      // Calculate new points
+      final updatedPoints = currentPoints - oldRating + rating;
+
+      // Update user points
+      await userRef.set({
+        'points': updatedPoints,
+        // Add other user fields if necessary
+      }, SetOptions(merge: true));
 
       // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -365,7 +391,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                       false; // Allow rating to be edited
                                 });
                               },
-                              child: const Text('Edit Rating'),
+                              child: const Text('Edit Points'),
                             ),
                           ],
                         )
